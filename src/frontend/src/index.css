@@ -1,0 +1,301 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* RMS Production House — Dark Cinema Theme */
+  :root {
+    --radius: 0.5rem;
+    color-scheme: dark;
+
+    /* Background */
+    --background: 0.09 0.008 285;
+    --foreground: 0.96 0 0;
+
+    /* Card - deep purple panel */
+    --card: 0.13 0.055 300;
+    --card-foreground: 0.96 0 0;
+
+    /* Popover */
+    --popover: 0.13 0.055 300;
+    --popover-foreground: 0.96 0 0;
+
+    /* Primary = gold */
+    --primary: 0.71 0.11 75;
+    --primary-foreground: 0.09 0 0;
+
+    /* Secondary = deep purple */
+    --secondary: 0.16 0.07 300;
+    --secondary-foreground: 0.96 0 0;
+
+    /* Muted */
+    --muted: 0.16 0.04 290;
+    --muted-foreground: 0.74 0.01 280;
+
+    /* Accent = neon purple */
+    --accent: 0.45 0.27 290;
+    --accent-foreground: 0.96 0 0;
+
+    /* Destructive */
+    --destructive: 0.577 0.245 27.325;
+    --destructive-foreground: 0.96 0 0;
+
+    /* Border */
+    --border: 0.19 0.04 295;
+    --input: 0.16 0.04 290;
+    --ring: 0.71 0.11 75;
+
+    /* Gold tokens */
+    --gold: 0.71 0.11 75;
+    --gold-light: 0.75 0.1 75;
+
+    /* Neon tokens */
+    --neon: 0.45 0.27 290;
+    --neon-bright: 0.5 0.28 290;
+
+    /* Charts */
+    --chart-1: 0.71 0.11 75;
+    --chart-2: 0.5 0.28 290;
+    --chart-3: 0.6 0.15 200;
+    --chart-4: 0.55 0.2 150;
+    --chart-5: 0.65 0.18 30;
+
+    /* Sidebar */
+    --sidebar: 0.12 0.012 285;
+    --sidebar-foreground: 0.96 0 0;
+    --sidebar-primary: 0.71 0.11 75;
+    --sidebar-primary-foreground: 0.09 0 0;
+    --sidebar-accent: 0.16 0.07 300;
+    --sidebar-accent-foreground: 0.96 0 0;
+    --sidebar-border: 0.19 0.04 295;
+    --sidebar-ring: 0.71 0.11 75;
+  }
+
+  .dark {
+    --background: 0.09 0.008 285;
+    --foreground: 0.96 0 0;
+    --card: 0.13 0.055 300;
+    --card-foreground: 0.96 0 0;
+    --popover: 0.13 0.055 300;
+    --popover-foreground: 0.96 0 0;
+    --primary: 0.71 0.11 75;
+    --primary-foreground: 0.09 0 0;
+    --secondary: 0.16 0.07 300;
+    --secondary-foreground: 0.96 0 0;
+    --muted: 0.16 0.04 290;
+    --muted-foreground: 0.74 0.01 280;
+    --accent: 0.45 0.27 290;
+    --accent-foreground: 0.96 0 0;
+    --destructive: 0.577 0.245 27.325;
+    --destructive-foreground: 0.96 0 0;
+    --border: 0.19 0.04 295;
+    --input: 0.16 0.04 290;
+    --ring: 0.71 0.11 75;
+    --gold: 0.71 0.11 75;
+    --gold-light: 0.75 0.1 75;
+    --neon: 0.45 0.27 290;
+    --neon-bright: 0.5 0.28 290;
+    --chart-1: 0.71 0.11 75;
+    --chart-2: 0.5 0.28 290;
+    --chart-3: 0.6 0.15 200;
+    --chart-4: 0.55 0.2 150;
+    --chart-5: 0.65 0.18 30;
+    --sidebar: 0.12 0.012 285;
+    --sidebar-foreground: 0.96 0 0;
+    --sidebar-primary: 0.71 0.11 75;
+    --sidebar-primary-foreground: 0.09 0 0;
+    --sidebar-accent: 0.16 0.07 300;
+    --sidebar-accent-foreground: 0.96 0 0;
+    --sidebar-border: 0.19 0.04 295;
+    --sidebar-ring: 0.71 0.11 75;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-foreground font-inter;
+    overflow-x: hidden;
+  }
+}
+
+@layer components {
+  .font-cinzel {
+    font-family: "Cinzel", serif;
+  }
+
+  .text-gold {
+    color: oklch(var(--gold));
+  }
+
+  .text-neon {
+    color: oklch(var(--neon-bright));
+  }
+
+  .bg-deep-purple {
+    background: linear-gradient(
+      135deg,
+      oklch(0.13 0.055 300),
+      oklch(0.16 0.07 300)
+    );
+  }
+
+  .section-padding {
+    @apply py-20 md:py-28 lg:py-32;
+  }
+
+  .container-rms {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 font-inter font-semibold uppercase tracking-widest text-sm;
+    background: oklch(var(--gold));
+    color: oklch(0.09 0 0);
+    padding: 0.75rem 2rem;
+    border: 1px solid oklch(var(--gold));
+    transition: all 0.3s ease;
+  }
+
+  .btn-gold:hover {
+    background: oklch(var(--gold-light));
+    box-shadow: 0 0 20px oklch(var(--gold) / 0.4), 0 0 60px
+      oklch(var(--gold) / 0.15);
+    transform: translateY(-1px);
+  }
+
+  .btn-outline-gold {
+    @apply inline-flex items-center justify-center gap-2 font-inter font-semibold uppercase tracking-widest text-sm;
+    background: transparent;
+    color: oklch(var(--gold));
+    padding: 0.75rem 2rem;
+    border: 1px solid oklch(var(--gold));
+    transition: all 0.3s ease;
+  }
+
+  .btn-outline-gold:hover {
+    background: oklch(var(--gold) / 0.1);
+    box-shadow: 0 0 20px oklch(var(--gold) / 0.3);
+    transform: translateY(-1px);
+  }
+
+  .service-card {
+    background: oklch(0.13 0.055 300);
+    border: 1px solid oklch(0.19 0.04 295);
+    transition: all 0.4s ease;
+  }
+
+  .service-card:hover {
+    border-color: oklch(var(--neon));
+    box-shadow: 0 0 30px oklch(var(--neon) / 0.25), 0 8px 32px
+      rgba(0, 0, 0, 0.5);
+    transform: translateY(-4px);
+  }
+
+  .portfolio-card {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+  }
+
+  .portfolio-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 40px oklch(var(--neon) / 0.3);
+  }
+
+  .section-label {
+    @apply font-cinzel uppercase tracking-[0.3em] text-sm;
+    color: oklch(var(--gold));
+  }
+
+  .section-title {
+    @apply font-cinzel font-bold text-4xl md:text-5xl lg:text-6xl uppercase tracking-wider;
+    color: oklch(0.96 0 0);
+  }
+
+  .gold-underline {
+    position: relative;
+    display: inline-block;
+  }
+
+  .gold-underline::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      oklch(var(--gold)),
+      oklch(var(--gold-light)),
+      transparent
+    );
+  }
+
+  .glow-neon {
+    box-shadow: 0 0 20px oklch(var(--neon) / 0.4), 0 0 60px
+      oklch(var(--neon) / 0.2);
+  }
+
+  .hero-gradient {
+    background: linear-gradient(
+      135deg,
+      oklch(0.05 0.02 285) 0%,
+      oklch(0.08 0.04 295) 25%,
+      oklch(0.12 0.08 300) 50%,
+      oklch(0.09 0.05 295) 75%,
+      oklch(0.05 0.02 285) 100%
+    );
+    background-size: 400% 400%;
+    animation: gradient-shift 12s ease infinite;
+  }
+
+  .nav-blur {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  /* Logo treatment — subtle shadow to lift the logo off dark backgrounds */
+  .logo-shadow {
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6))
+      drop-shadow(0 0 16px rgba(201, 162, 74, 0.15));
+  }
+
+  /* Rainbow gradient text — matches logo's vibrant multicolor aesthetic */
+  .gradient-rainbow-text {
+    background: linear-gradient(
+      90deg,
+      #ff6b6b,
+      #ffd93d,
+      #6bcb77,
+      #4d96ff,
+      #c77dff
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Multicolor neon glow — echoes the rainbow border on the logo's clapperboard */
+  .neon-glow-multicolor {
+    box-shadow: 0 0 10px oklch(0.65 0.25 0), 0 0 20px oklch(0.65 0.25 290), 0 0
+      30px oklch(0.65 0.25 150);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .tracking-cinzel {
+    letter-spacing: 0.15em;
+  }
+}
