@@ -86,6 +86,19 @@ actor {
   let services = Map.empty<Nat, Service>();
   let userProfiles = Map.empty<Principal, UserProfile>();
 
+  // Allow the first logged-in user to claim admin if no admin exists yet
+  public shared ({ caller }) func claimFirstAdmin() : async Bool {
+    if (caller.isAnonymous()) { return false };
+    if (accessControlState.adminAssigned) { return false };
+    accessControlState.userRoles.add(caller, #admin);
+    accessControlState.adminAssigned := true;
+    true;
+  };
+
+  public query func hasAdminBeenAssigned() : async Bool {
+    accessControlState.adminAssigned;
+  };
+
   public shared ({ caller }) func submitForm(submission : Submission) : async () {
     let id = getNextId();
     let newSubmission = { submission with id };
@@ -172,4 +185,3 @@ actor {
     testimonials.values().toArray().filter(func(testimonial) { testimonial.rating >= minRating });
   };
 };
-

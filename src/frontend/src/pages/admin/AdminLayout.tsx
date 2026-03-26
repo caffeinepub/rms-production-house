@@ -14,7 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useActor } from "../../hooks/useActor";
 import { useInternetIdentity } from "../../hooks/useInternetIdentity";
 import { Dashboard } from "./Dashboard";
@@ -28,15 +28,24 @@ const navItems = [
   { to: "/admin/submissions", label: "Submissions", icon: Inbox },
 ];
 
+type ExtendedActor = {
+  isCallerAdmin(): Promise<boolean>;
+  hasAdminBeenAssigned(): Promise<boolean>;
+  claimFirstAdmin(): Promise<boolean>;
+};
+
 export function AdminLayout() {
   const { login, clear, loginStatus, identity, isInitializing } =
     useInternetIdentity();
-  const { actor, isFetching } = useActor();
+  const { actor: rawActor, isFetching } = useActor();
+  const actor = rawActor as unknown as ExtendedActor | null;
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [adminAssigned, setAdminAssigned] = useState<boolean | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
   const location = useLocation();
 
-  useEffect(() => {
+  const checkAdmin = useCallback(() => {
     if (!actor || isFetching || !identity) {
       setIsAdmin(null);
       return;
@@ -46,6 +55,33 @@ export function AdminLayout() {
       .then(setIsAdmin)
       .catch(() => setIsAdmin(false));
   }, [actor, isFetching, identity]);
+
+  useEffect(() => {
+    checkAdmin();
+  }, [checkAdmin]);
+
+  useEffect(() => {
+    if (!actor || isFetching || !identity || isAdmin !== false) return;
+    actor
+      .hasAdminBeenAssigned()
+      .then(setAdminAssigned)
+      .catch(() => setAdminAssigned(true));
+  }, [actor, isFetching, identity, isAdmin]);
+
+  const handleClaimAdmin = async () => {
+    if (!actor) return;
+    setIsClaiming(true);
+    try {
+      const success = await actor.claimFirstAdmin();
+      if (success) {
+        checkAdmin();
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setIsClaiming(false);
+    }
+  };
 
   if (isInitializing) {
     return (
@@ -113,6 +149,78 @@ export function AdminLayout() {
   }
 
   if (!isAdmin) {
+    // Still loading whether admin has been assigned
+    if (adminAssigned === null) {
+      return (
+        <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 animate-spin text-yellow-500 mx-auto mb-3" />
+            <p className="text-zinc-400 text-sm">Checking admin status...</p>
+          </div>
+        </div>
+      );
+    }
+
+    // No admin assigned yet — show claim button
+    if (!adminAssigned) {
+      return (
+        <div
+          className="min-h-screen bg-zinc-950 flex items-center justify-center"
+          data-ocid="admin.page"
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center max-w-md mx-auto px-6"
+          >
+            <div className="w-16 h-16 rounded-full bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center mx-auto mb-6">
+              <Shield className="w-8 h-8 text-yellow-500" />
+            </div>
+            <h1 className="font-cinzel text-2xl font-bold text-white mb-2">
+              Claim Admin Access
+            </h1>
+            <p className="text-zinc-400 mb-8 text-sm leading-relaxed">
+              No admin has been assigned yet. As the first user, you can claim
+              admin access for your account.
+            </p>
+            <Button
+              onClick={handleClaimAdmin}
+              disabled={isClaiming}
+              className="bg-yellow-500 hover:bg-yellow-400 text-black font-semibold uppercase tracking-widest text-sm px-8 py-3 w-full mb-3"
+              data-ocid="admin.primary_button"
+            >
+              {isClaiming ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  Claiming...
+                </>
+              ) : (
+                "Claim Admin Access"
+              )}
+            </Button>
+            <div className="flex gap-3 justify-center">
+              <Button
+                variant="outline"
+                onClick={() => clear()}
+                className="border-zinc-700 text-zinc-300 hover:border-yellow-500 hover:text-yellow-500"
+                data-ocid="admin.cancel_button"
+              >
+                Sign Out
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="border-zinc-700 text-zinc-300 hover:border-yellow-500 hover:text-yellow-500"
+              >
+                <Link to="/">Back to Site</Link>
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      );
+    }
+
+    // Admin already assigned — access denied
     return (
       <div
         className="min-h-screen bg-zinc-950 flex items-center justify-center"
