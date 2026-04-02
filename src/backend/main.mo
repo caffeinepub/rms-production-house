@@ -86,17 +86,25 @@ actor {
   let services = Map.empty<Nat, Service>();
   let userProfiles = Map.empty<Principal, UserProfile>();
 
+  // Check if any admin exists in the roles map (source of truth)
+  func anyAdminExists() : Bool {
+    for ((_, role) in accessControlState.userRoles.entries()) {
+      if (role == #admin) { return true };
+    };
+    false;
+  };
+
   // Allow the first logged-in user to claim admin if no admin exists yet
   public shared ({ caller }) func claimFirstAdmin() : async Bool {
     if (caller.isAnonymous()) { return false };
-    if (accessControlState.adminAssigned) { return false };
+    if (anyAdminExists()) { return false };
     accessControlState.userRoles.add(caller, #admin);
     accessControlState.adminAssigned := true;
     true;
   };
 
   public query func hasAdminBeenAssigned() : async Bool {
-    accessControlState.adminAssigned;
+    anyAdminExists();
   };
 
   public shared ({ caller }) func submitForm(submission : Submission) : async () {

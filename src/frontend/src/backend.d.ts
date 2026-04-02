@@ -73,6 +73,7 @@ export interface backendInterface {
     addTeamMember(member: TeamMember): Promise<void>;
     addTestimonial(testimonial: Testimonial): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    claimFirstAdmin(): Promise<boolean>;
     getAllPortfolioItems(): Promise<Array<PortfolioItem>>;
     getAllServices(): Promise<Array<Service>>;
     getAllSubmissions(): Promise<Array<Submission>>;
@@ -87,6 +88,7 @@ export interface backendInterface {
     getTestimonial(id: bigint): Promise<Testimonial | null>;
     getTestimonialsByRating(minRating: bigint): Promise<Array<Testimonial>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    hasAdminBeenAssigned(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     submitForm(submission: Submission): Promise<void>;

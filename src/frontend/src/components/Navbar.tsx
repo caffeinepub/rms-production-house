@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { Menu, Shield, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 
@@ -72,8 +72,17 @@ export function Navbar() {
               ))}
             </nav>
 
-            {/* CTA Button */}
-            <div className="hidden md:flex items-center">
+            {/* CTA + Admin */}
+            <div className="hidden md:flex items-center gap-3">
+              <Link
+                to="/admin"
+                title="Admin Login"
+                data-ocid="nav.admin_button"
+                className="flex items-center gap-1.5 font-inter text-xs uppercase tracking-widest text-muted-foreground hover:text-gold border border-border hover:border-gold/50 px-3 py-2 rounded-sm transition-all duration-200"
+              >
+                <Shield size={13} strokeWidth={1.5} />
+                Admin
+              </Link>
               <Link to="/contact" data-ocid="nav.primary_button">
                 <button
                   type="button"
@@ -146,6 +155,15 @@ export function Navbar() {
                     {link.label}
                   </Link>
                 ))}
+                {/* Admin link in mobile */}
+                <Link
+                  to="/admin"
+                  className="flex items-center gap-2 px-4 py-3 font-inter text-sm uppercase tracking-widest text-muted-foreground hover:text-gold hover:bg-secondary/50 transition-colors rounded"
+                  data-ocid="nav.admin_button"
+                >
+                  <Shield size={14} strokeWidth={1.5} />
+                  Admin Login
+                </Link>
               </nav>
               <div className="mt-auto px-6 pb-8">
                 <Link

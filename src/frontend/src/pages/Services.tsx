@@ -162,6 +162,18 @@ export function Services() {
         </div>
       </section>
 
+      {/* Visual Banner */}
+      <section className="container-rms overflow-hidden rounded-sm">
+        <div className="relative" style={{ height: "350px" }}>
+          <img
+            src="/assets/generated/services-visual-banner.dim_1200x400.jpg"
+            alt="Visual Production"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
+        </div>
+      </section>
+
       {/* Visual Production */}
       <section className="section-padding bg-gradient-to-b from-background to-[oklch(0.12_0.05_300)]">
         <div className="container-rms">
@@ -201,6 +213,24 @@ export function Services() {
           </motion.div>
         </div>
       </section>
+
+      {/* Audio Banner */}
+      <motion.section
+        className="container-rms overflow-hidden rounded-sm"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.9 }}
+      >
+        <div className="relative" style={{ height: "350px" }}>
+          <img
+            src="/assets/generated/services-audio-banner.dim_1200x400.jpg"
+            alt="Audio & Music Production"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
+        </div>
+      </motion.section>
 
       {/* Audio & Music */}
       <section className="section-padding bg-[oklch(0.12_0.05_300)]">

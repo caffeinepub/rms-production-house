@@ -180,6 +180,8 @@ export interface backendInterface {
     getTestimonial(id: bigint): Promise<Testimonial | null>;
     getTestimonialsByRating(minRating: bigint): Promise<Array<Testimonial>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    claimFirstAdmin(): Promise<boolean>;
+    hasAdminBeenAssigned(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     submitForm(submission: Submission): Promise<void>;
@@ -549,6 +551,34 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.getUserProfile(arg0);
             return from_candid_opt_n22(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async claimFirstAdmin(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.claimFirstAdmin();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.claimFirstAdmin();
+            return result;
+        }
+    }
+    async hasAdminBeenAssigned(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.hasAdminBeenAssigned();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.hasAdminBeenAssigned();
+            return result;
         }
     }
     async isCallerAdmin(): Promise<boolean> {

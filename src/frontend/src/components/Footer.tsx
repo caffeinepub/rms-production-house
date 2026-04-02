@@ -3,10 +3,6 @@ import { ArrowUp, Mail, MapPin, Phone } from "lucide-react";
 import { SiFacebook, SiInstagram, SiX, SiYoutube } from "react-icons/si";
 
 export function Footer() {
-  const year = new Date().getFullYear();
-  const hostname =
-    typeof window !== "undefined" ? window.location.hostname : "";
-
   return (
     <footer className="bg-[oklch(0.07_0.01_285)] border-t border-border">
       <div className="container-rms py-16">
@@ -123,18 +119,7 @@ export function Footer() {
 
       {/* Bottom Bar */}
       <div className="border-t border-border">
-        <div className="container-rms py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="font-inter text-xs text-muted-foreground">
-            &copy; {year}. Built with <span className="text-gold">♥</span> using{" "}
-            <a
-              href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(hostname)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-gold transition-colors"
-            >
-              caffeine.ai
-            </a>
-          </p>
+        <div className="container-rms py-5 flex flex-col sm:flex-row items-center justify-end gap-4">
           <button
             type="button"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}

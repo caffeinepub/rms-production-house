@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link, Outlet, useLocation } from "@tanstack/react-router";
 import {
+  AlertCircle,
   Images,
   Inbox,
   Layers,
@@ -9,12 +10,14 @@ import {
   LogOut,
   Menu,
   MessageSquare,
+  RefreshCw,
   Shield,
   Users,
   X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { backendInterface as FullBackendInterface } from "../../backend.d";
 import { useActor } from "../../hooks/useActor";
 import { useInternetIdentity } from "../../hooks/useInternetIdentity";
 import { Dashboard } from "./Dashboard";
@@ -28,37 +31,69 @@ const navItems = [
   { to: "/admin/submissions", label: "Submissions", icon: Inbox },
 ];
 
-type ExtendedActor = {
-  isCallerAdmin(): Promise<boolean>;
-  hasAdminBeenAssigned(): Promise<boolean>;
-  claimFirstAdmin(): Promise<boolean>;
-};
+type VerifyState = "idle" | "checking" | "done" | "error";
 
 export function AdminLayout() {
   const { login, clear, loginStatus, identity, isInitializing } =
     useInternetIdentity();
   const { actor: rawActor, isFetching } = useActor();
-  const actor = rawActor as unknown as ExtendedActor | null;
+  const actor = rawActor as unknown as FullBackendInterface | null;
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [adminAssigned, setAdminAssigned] = useState<boolean | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
+  const [verifyState, setVerifyState] = useState<VerifyState>("idle");
+  const verifyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const location = useLocation();
 
-  const checkAdmin = useCallback(() => {
-    if (!actor || isFetching || !identity) {
-      setIsAdmin(null);
-      return;
-    }
-    actor
-      .isCallerAdmin()
-      .then(setIsAdmin)
-      .catch(() => setIsAdmin(false));
-  }, [actor, isFetching, identity]);
+  const runAdminCheck = useCallback(
+    async (currentActor: FullBackendInterface) => {
+      setVerifyState("checking");
+      try {
+        const result = await currentActor.isCallerAdmin();
+        setIsAdmin(result);
+        setVerifyState("done");
+      } catch {
+        setIsAdmin(false);
+        setVerifyState("done");
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
-    checkAdmin();
-  }, [checkAdmin]);
+    // Clear any pending timeout
+    if (verifyTimeoutRef.current) clearTimeout(verifyTimeoutRef.current);
+
+    if (!identity) {
+      setIsAdmin(null);
+      setVerifyState("idle");
+      return;
+    }
+
+    if (isFetching) {
+      // Actor is loading — wait
+      return;
+    }
+
+    if (!actor) {
+      // Actor failed to initialize
+      setVerifyState("error");
+      return;
+    }
+
+    // Actor is ready — run the check with a timeout guard
+    verifyTimeoutRef.current = setTimeout(() => {
+      // If still "checking" after 15s, something hung — retry
+      setVerifyState((prev) => (prev === "checking" ? "error" : prev));
+    }, 15000);
+
+    runAdminCheck(actor);
+
+    return () => {
+      if (verifyTimeoutRef.current) clearTimeout(verifyTimeoutRef.current);
+    };
+  }, [actor, isFetching, identity, runAdminCheck]);
 
   useEffect(() => {
     if (!actor || isFetching || !identity || isAdmin !== false) return;
@@ -74,13 +109,20 @@ export function AdminLayout() {
     try {
       const success = await actor.claimFirstAdmin();
       if (success) {
-        checkAdmin();
+        await runAdminCheck(actor);
       }
     } catch {
       // silently fail
     } finally {
       setIsClaiming(false);
     }
+  };
+
+  const handleRetry = () => {
+    setVerifyState("idle");
+    setIsAdmin(null);
+    // Re-trigger by reloading the page — actor query will re-run
+    window.location.reload();
   };
 
   if (isInitializing) {
@@ -137,12 +179,47 @@ export function AdminLayout() {
     );
   }
 
-  if (isFetching || isAdmin === null) {
+  // Show spinner while actor is loading or check is in-flight
+  if (isFetching || verifyState === "checking" || verifyState === "idle") {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-yellow-500 mx-auto mb-3" />
           <p className="text-zinc-400 text-sm">Verifying access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Actor failed or check timed out
+  if (verifyState === "error") {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+        <div className="text-center max-w-sm mx-auto px-6">
+          <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-6">
+            <AlertCircle className="w-8 h-8 text-red-400" />
+          </div>
+          <h1 className="font-cinzel text-2xl font-bold text-white mb-2">
+            Connection Failed
+          </h1>
+          <p className="text-zinc-400 mb-8 text-sm leading-relaxed">
+            Could not connect to the backend. This can happen on first load.
+            Please try again.
+          </p>
+          <Button
+            onClick={handleRetry}
+            className="bg-yellow-500 hover:bg-yellow-400 text-black font-semibold uppercase tracking-widest text-sm px-8 py-3 w-full mb-3"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Retry
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => clear()}
+            className="border-zinc-700 text-zinc-300 hover:border-yellow-500 hover:text-yellow-500 w-full"
+          >
+            Sign Out
+          </Button>
         </div>
       </div>
     );
